@@ -1,0 +1,437 @@
+const router = require('express').Router();
+const bus = require('../models/User');
+
+// Insert 
+router.post('/api/bus', async(req, res) => {
+    try {
+        const newItem = new bus({
+          email: req.body.email,
+          password: req.body.password,
+          profile_pic: req.body.profile_pic,
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          address: req.body.address,
+          phone_number: req.body.phone_number
+        })
+        const save = await newItem.save()
+        res.status(200).json(newItem);
+    } catch (error) {
+        res.json(error)
+    }
+})
+
+router.post('/api/search', async(req, res) => {
+    try {
+        const reqFrom = req.body.from;
+        const reqTo = req.body.to;
+        const item = await bus.find({from: reqFrom, to: reqTo});
+        res.status(200).json(item);
+    } catch (error) {
+        res.json(error);
+    }
+})
+
+router.delete('/api/bus/:id', async (req,res)=>{    
+    try {
+        console.log(req.params.id)
+        const deleteItem = await bus.deleteOne({busId: req.params.id});
+        res.status(200).json('Item deleted');
+    } catch (error) {
+        res.json(error)
+    }
+})
+
+router.get("/api/buses", async(req, res) => {
+    try {
+        const entries = await bus.find({})
+        res.status(200).json(entries);
+    } catch (error) {
+        res.json(error);
+    }
+})
+
+module.exports = router;
+// const Sequelize = require('sequelize');
+// const { QueryTypes } = require('sequelize');
+// const db = require('../models');
+// const bcryptjs = require('bcryptjs');
+// const bus = require('../models/User');
+// const jwt = require('jsonwebtoken');
+// const { Op } = Sequelize;
+// const io = require('../utils/socket');
+// const router = require('express').Router();
+// router.post('/api/user', async(req, res) => {
+//   try {
+//       const newItem = new bus({
+//         email: req.body.email,
+//         password: req.body.password,
+//         profile_pic: req.body.profile_pic,
+//         first_name: req.body.first_name,
+//         last_name: req.body.last_name,
+//         address: req.body.address,
+//         phone_number: req.body.phone_number
+//       })
+//       const save = await newItem.save()
+//       res.status(200).json(newItem);
+//   } catch (error) {
+//       res.json(error)
+//   }
+// })
+// //const createUser = async (req, res) => {
+// //  const email = req.body.email;
+// //  const password = req.body.password;
+// //  const profile_pic = req.body.profile_pic;
+// //  const first_name = req.body.first_name;
+// //  const last_name = req.body.last_name;
+// //  const address = req.body.address;
+// //  const phone_number = req.body.phone_number;
+// //  try {
+// //    const filters = { email: email };
+// //    const user = await db.user.findOne({ where: filters });
+// //    if (user) {
+// //      res.status(400).send({ message: 'Invalid your E-mail' });
+// //    } else {
+// //      const salt = await bcryptjs.genSalt(12);
+// //      const hashedPassword = await bcryptjs.hash(password, salt);
+// //      const body = {
+// //        email,
+// //        password: hashedPassword,
+// //        profile_pic,
+// //        first_name,
+// //        last_name,
+// //        address,
+// //        phone_number,
+// //      };
+// //      const created = await db.user.create(body);
+// //      res.status(200).send({ message: 'User created', created });
+// //    }
+// //  } catch (error) {
+// //    console.log(error);
+// //    res.send(error);
+// //  }
+// //};
+
+// // const loginUser = async (req, res) => {
+// //   const email = req.body.email;
+// //   const password = req.body.password;
+// //   const user = await db.user.findOne({ where: { email: email } });
+// //   if (!user) {
+// //     res.status(400).send({ message: 'Invalid Username or Password' });
+// //   } else {
+// //     const isSuccess = await bcryptjs.compare(password, user.password);
+// //     if (isSuccess) {
+// //       const payload = {
+// //         id: user.id,
+// //         name: user.first_name,
+// //       };
+// //       const token = jwt.sign(payload, 'superSecretKey', { expiresIn: 10800 });
+
+// //       // check whether the user is a driver or not
+// //       try {
+// //         const driverInfo = await db.driver.findOne({ where: { id: user.id } });
+// //         res.status(200).send({
+// //           message: `Driver is logged in`,
+// //           isSuccess,
+// //           token,
+// //           isDriver: true,
+// //           driverId: driverInfo.id,
+// //         });
+// //       } catch (err) {
+// //         res.status(200).send({
+// //           message: `User is logged in`,
+// //           isSuccess,
+// //           token,
+// //           isDriver: false,
+// //         });
+// //       }
+// //     } else {
+// //       res.status(400).send({ message: 'Invalid Username or Password' });
+// //     }
+// //   }
+// // };
+
+// // const get = async (req, res) => {
+// //   // const id = await req.user.id;
+// //   const id = req.params.id;
+// //   const userData = await db.user.findOne({
+// //     where: { id: id },
+// //   });
+// //   try {
+// //     res.send({ userData: userData });
+// //   } catch (e) {
+// //     console.log(e);
+// //     res.send('error');
+// //   }
+// // };
+
+// // const findTrip = async (req, res) => {
+// //   const destinationLat = Number(req.query.destinationLat);
+// //   const destinationLng = Number(req.query.destinationLng);
+
+// //   const { price, seatingCapacity } = req.query;
+// //   const date = Number(req.query.date);
+
+// //   const luggage = req.query.luggage === 'true' ? 1 : 0;
+// //   console.log(typeof date);
+// //   const DISTANCE = 0.00899322;
+
+// //   try {
+// //     const result = await db.driver.findAll({
+// //       where: {
+// //         to_lat: {
+// //           [Op.between]: [destinationLat - DISTANCE, destinationLat + DISTANCE],
+// //         },
+// //         to_lng: {
+// //           [Op.between]: [destinationLng - DISTANCE, destinationLng + DISTANCE],
+// //         },
+// //         seating_capacity: {
+// //           [Op.gte]: Number(seatingCapacity),
+// //         },
+// //         price: {
+// //           [Op.lte]: Number(price),
+// //         },
+// //         luggage: {
+// //           [Op.gte]: luggage,
+// //         },
+// //         status: 'available',
+// //         id: {
+// //           [Op.ne]: Number(req.user.id),
+// //         },
+// //         date_time: {
+// //           [Op.between]: [date - 3600000, date + 3600000],
+// //         },
+// //       },
+// //     });
+
+// //     if (result.length === 0) {
+// //       res.status(404).send({ message: 'No driver found' });
+// //       return;
+// //     }
+
+// //     const driverResultIdx = [];
+// //     for (let i of result) {
+// //       driverResultIdx.push(i.id);
+// //     }
+
+// //     let allIdIwant = '';
+// //     for (let item of driverResultIdx) {
+// //       if (allIdIwant !== '') allIdIwant += ' or ';
+// //       allIdIwant += `users_data.id = ${item}`;
+// //     }
+
+// //     const driversData = await db.sequelize.query(
+// //       `SELECT * FROM rider_development.drivers drivers_data 
+// //       join rider_development.users users_data on users_data.id = drivers_data.id
+// //       and (${allIdIwant})
+// //       `,
+// //       { type: QueryTypes.SELECT }
+// //     );
+
+// //     res.status(200).send(driversData);
+// //   } catch (err) {
+// //     console.log(err);
+// //   }
+// // };
+
+// // const selectDriver = async (req, res) => {
+// //   const { id } = req.params;
+// //   let driverData;
+
+// //   try {
+// //     const driver = await db.driver.findOne({
+// //       where: { id },
+// //       raw: true,
+// //     });
+
+// //     const user = await db.user.findOne({
+// //       where: { id },
+// //     });
+
+// //     driverData = {
+// //       ...driver,
+// //       first_name: user.first_name,
+// //       last_name: user.last_name,
+// //       phone_number: user.phone_number,
+// //       profile_pic: user.profile_pic,
+// //     };
+
+// //     res.status(200).send(driverData);
+// //   } catch (err) {
+// //     res.status(400).send(err);
+// //     console.log(err);
+// //   }
+// // };
+
+// // const edited = async (req, res) => {
+// //   const id = await req.user.id;
+// //   const first_name = req.body.first_name;
+// //   const last_name = req.body.last_name;
+// //   const address = req.body.address;
+// //   const phone_number = req.body.phone_number;
+// //   const profile_pic = req.body.profile_pic;
+
+// //   const user = await db.user.findOne({ where: { id: id } });
+
+// //   const values = { first_name: first_name };
+// //   if (last_name) {
+// //     values['last_name'] = last_name;
+// //   }
+// //   if (address) {
+// //     values['address'] = address;
+// //   }
+// //   if (phone_number) {
+// //     values['phone_number'] = phone_number;
+// //   }
+// //   if (profile_pic) {
+// //     values['profile_pic'] = profile_pic;
+// //   }
+
+// //   if (user) {
+// //     const edited = await db.user.update(values, { where: { id: id } });
+// //     try {
+// //       res.status(200).send({ message: 'user edited', edited: edited });
+// //     } catch (error) {
+// //       res.status(400).send(error);
+// //     }
+// //   } else {
+// //     res.status(400).send(`Invalid user`);
+// //   }
+// // };
+
+// // const waitForConfirmation = async (req, res) => {
+// //   let userData = await req.user;
+
+// //   console.log('passenger is waiting for confirmation');
+// //   let requestedDriver = await db.driver.findOne({
+// //     where: {
+// //       passenger_id: userData.id,
+// //       [Op.or]: [{ confirmation: 'confirmed' }, { confirmation: 'pending' }],
+// //     },
+// //   });
+
+// //   console.log('requestedDriver', requestedDriver);
+
+// //   res.status(200).send(requestedDriver.confirmation);
+// //   // try {
+// //   //   if (requestedDriver) {
+// //   //     console.log('if requestedDriver', requestedDriver.id);
+// //   //     switch (requestedDriver.confirmation) {
+// //   //       case 'confirmed':
+// //   //         res.status(200).json({
+// //   //           message: 'driver confirmed your trip',
+// //   //           confirmation: result.confirmation,
+// //   //           status: result.status,
+// //   //         });
+// //   //         break;
+// //   //       case 'pending':
+// //   //         break;
+// //   //       default:
+// //   //         res.status(400).json({
+// //   //           message: 'something is wrong',
+// //   //         });
+// //   //         break;
+// //   //     }
+// //   //   } else {
+// //   //     res.status(200).json({
+// //   //       message: 'driver rejected the ride',
+// //   //       confirmation: 'denied',
+// //   //     });
+// //   //   }
+// //   // } catch (err) {
+// //   //   res.status(400).json({
+// //   //     message: err,
+// //   //   });
+// //   // }
+// // };
+
+// // // const waitForConfirmation = async (req, res) => {
+// // //   let userData = await req.user;
+
+// // //   let driverPromise = new Promise(function (resolve, reject) {
+// // //     const checkConfirmation = setInterval(async () => {
+// // //       console.log('passenger is waiting for confirmation');
+// // //       let requestedDriver = await db.driver.findOne({
+// // //         where: {
+// // //           passenger_id: userData.id,
+// // //           [Op.or]: [{ confirmation: 'confirmed' }, { confirmation: 'pending' }],
+// // //         },
+// // //       });
+
+// // //       try {
+// // //         if (requestedDriver) {
+// // //           console.log('if requestedDriver', requestedDriver.id);
+// // //           switch (requestedDriver.confirmation) {
+// // //             case 'confirmed':
+// // //               clearInterval(checkConfirmation);
+// // //               resolve(requestedDriver);
+// // //               break;
+// // //             case 'pending':
+// // //               break;
+// // //             default:
+// // //               reject('something is wrong');
+// // //               break;
+// // //           }
+// // //         } else {
+// // //           clearInterval(checkConfirmation);
+// // //           resolve('driver rejected the ride');
+// // //         }
+// // //       } catch (err) {
+// // //         reject(err);
+// // //         clearInterval(checkConfirmation);
+// // //       }
+// // //     }, 3000);
+// // //   });
+
+// // //   driverPromise
+// // //     .then(result => {
+// // //       if (result.confirmation) {
+// // //         res.status(200).json({
+// // //           message: 'driver confirmed your trip',
+// // //           confirmation: result.confirmation,
+// // //           status: result.status,
+// // //         });
+// // //       } else {
+// // //         res.status(200).json({
+// // //           message: result,
+// // //           confirmation: 'denied',
+// // //         });
+// // //       }
+// // //     })
+// // //     .catch(error => {
+// // //       res.status(400).json({
+// // //         message: error,
+// // //       });
+// // //     });
+// // // };
+
+// // const passengerCancelTrip = async (req, res) => {
+// //   try {
+// //     let result = db.driver.update(
+// //       {
+// //         passenger_id: null,
+// //         status: null,
+// //         confirmation: null,
+// //       },
+// //       {
+// //         where: {
+// //           passenger_id: req.body.userId,
+// //         },
+// //       }
+// //     );
+
+// //     io.getIO().emit('cancelTrip', {
+// //       message: `The trip got canceled`,
+// //       // receiverId: passengerId,
+// //     });
+
+// //     res.status(201).json({
+// //       message: 'the trip is canceled',
+// //     });
+// //   } catch (err) {
+// //     res.status(400).json({
+// //       message: 'error',
+// //     });
+// //   }
+// // };
+
+module.exports = router;
