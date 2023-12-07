@@ -7,6 +7,8 @@ import { UserOutlined } from '@ant-design/icons';
 import '../../styles/UserRegisterRoute.css';
 import '../../styles/LoginUser.css';
 import * as storageItem from '../../configs/localStorageItems';
+// import { auth } from '../../firbase/firbase';
+ import {signInWithEmailAndPassword} from "firebase/auth"
 
 const formItemLayout = {
   labelCol: {
@@ -44,11 +46,22 @@ function LoginUser(props) {
       email: values.email,
       password: values.password,
     };
+console.log(body.email);
+console.log(body.password);
 
     try {
+      signInWithEmailAndPassword(auth,body.email,body.password).then(async(res)=>{
+        console.log('OK');
+     
+       alert('');
+       
+      }).catch((erro)=>{
+      console.log(erro);
+      });
       const createUser = await axios.post('/user/loginUser', body);
       localStorage.setItem(storageItem.ACCESS_TOKEN, createUser.data.token);
 
+    
       try {
         console.log('isDriver', createUser.data.isDriver);
         if (createUser.data.isDriver) {

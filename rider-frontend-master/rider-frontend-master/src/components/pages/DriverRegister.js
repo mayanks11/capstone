@@ -13,7 +13,7 @@ import {
   Avatar,
 } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import { Link, Redirect } from 'react-router-dom';
+import { Link , Redirect } from 'react-router-dom';
 import * as storageItem from '../../configs/localStorageItems';
 
 const { Option } = Select;
@@ -59,6 +59,7 @@ function DriverRegister(props) {
 
   useEffect(() => {
     if (localStorage.getItem('ACCESS_TOKEN')) {
+
       const user = jwtDecode(localStorage.getItem('ACCESS_TOKEN'));
       setIsLogin(true);
       setUserInfo(user);

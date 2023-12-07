@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import axios from '../../configs/axios';
+import { auth } from '../../firbase/firbase';
+// import {signInWithEmailAndPassword} from "firebase/auth"
+import {createUserWithEmailAndPassword} from "firebase/auth" 
+
 import {
   Form,
   Input,
@@ -69,6 +73,8 @@ function UserRegisterRoute() {
   const [profile_pic, setProfilePic] = useState('');
 
   const onFinish = async values => {
+    let email=values.email;
+    let password=values.password;
     const body = {
       email: values.email,
       password: values.password,
@@ -78,17 +84,28 @@ function UserRegisterRoute() {
       address: values.address,
       phone_number: values.phone_number,
     };
+  
+    console.log(email);
+    console.log(password);
+   
+    
 
     try {
-      await axios.post('/api/bus', body);
-      console.log('OK');
-      alert('User created');
-      form.resetFields();
-      setRegisterFinish(true);
+      createUserWithEmailAndPassword(auth,email,password).then(async(res)=>{
+         console.log('OK');
+        alert('User created');
+        //form.resetFields();
+        setRegisterFinish(true);
+       }).catch((erro)=>{
+       console.log(erro);
+       });
+
+     // await axios.post('/api/bus', body);
+     
     } catch (err) {
       console.log('fail');
       console.log(err);
-      form.resetFields();
+      //form.resetFields();
       alert('Invalid email');
     }
   };

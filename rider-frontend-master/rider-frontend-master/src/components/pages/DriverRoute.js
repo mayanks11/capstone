@@ -4,7 +4,7 @@ import PlaceSearch from '../PlaceSearch';
 import axios from '../../configs/axios';
 import '../../styles/DriverRoute.css';
 
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import { useLoadScript } from '@react-google-maps/api';
 import { DatePicker, TimePicker, Checkbox, InputNumber, Modal, notification, Button, message } from 'antd';
 import { CarOutlined } from '@ant-design/icons';
