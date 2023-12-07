@@ -9,6 +9,7 @@ import '../../styles/LoginUser.css';
 import * as storageItem from '../../configs/localStorageItems';
 // import { auth } from '../../firbase/firbase';
  import {signInWithEmailAndPassword} from "firebase/auth"
+ import { auth } from '../../firbase/firbase';
 
 const formItemLayout = {
   labelCol: {
